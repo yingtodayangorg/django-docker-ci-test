@@ -12,7 +12,10 @@ class TestUserView(APITestCase):
         self.data = {'name': 'Test2', 'dni': '09876543211'}
 
     def test_post(self):
-        response = self.client.post(self.url, self.data, format='json', follow=True)
+        response = self.client.post(
+            self.url, self.data,
+            format='json', follow=True
+        )
         self.assertEqual(response.status_code, 201)
         self.assertEqual(
             json.loads(response.content),
