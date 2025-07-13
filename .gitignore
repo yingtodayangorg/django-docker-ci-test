@@ -10,3 +10,4 @@ media/
 *.egg-info/
 *.pytest_cache/
 .env.*
+.coverage
