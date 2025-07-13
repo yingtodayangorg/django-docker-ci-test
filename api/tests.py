@@ -12,7 +12,7 @@ class TestUserView(APITestCase):
         self.data = {'name': 'Test2', 'dni': '09876543211'}
 
     def test_post(self):
-        response = self.client.post(self.url, self.data, format='json')
+        response = self.client.post(self.url, self.data, format='json', follow=True)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(
             json.loads(response.content),
@@ -21,12 +21,12 @@ class TestUserView(APITestCase):
         self.assertEqual(User.objects.count(), 2)
 
     def test_get_list(self):
-        response = self.client.get(self.url)
+        response = self.client.get(self.url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(json.loads(response.content)), 1)
 
     def test_get(self):
-        response = self.client.get(self.url + '1/')
+        response = self.client.get(self.url + '1/', follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             json.loads(response.content),
