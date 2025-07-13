@@ -3,6 +3,7 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 from .models import User
 
+
 class TestUserView(APITestCase):
     def setUp(self):
         user = User(name='Test1', dni='09876543210')
@@ -25,3 +26,4 @@ class TestUserView(APITestCase):
         response = self.client.get(self.url + '1/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.content), {"id": 1, "name":"Test1", "dni":"09876543210"})
+        
