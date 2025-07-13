@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
         DEBUG: 0
-        SECRET_KEY: ^gd^u-6@jc!i(2aw9a4u)j%wt7of693&1qro^kym&=7@5n&py=
+        DJANGO_SECRET_KEY: ^gd^u-6@jc!i(2aw9a4u)j%wt7of693&1qro^kym&=7@5n&py=
         DJANGO_ALLOWED_HOSTS: localhost
 
     steps:
