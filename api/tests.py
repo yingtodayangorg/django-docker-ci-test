@@ -10,6 +10,8 @@ class TestUserView(APITestCase):
         user.save()
         self.url = reverse("users-list")
         self.data = {'name': 'Test2', 'dni': '09876543211'}
+        self.put_data = {'name': 'Test3', 'dni': '09876543213'}
+        self.already_exists_data = {'name': 'Test1', 'dni': '09876543210'}
 
     def test_post(self):
         response = self.client.post(
@@ -35,4 +37,28 @@ class TestUserView(APITestCase):
         self.assertEqual(
             json.loads(response.content),
             {"id": 1, "name": "Test1", "dni": "09876543210"}
+        )
+
+    def test_put(self):
+        response = self.client.put(
+            self.url + '1/',
+            self.put_data,
+            format='json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            json.loads(response.content),
+            {"id": 1, "name": "Test3", "dni": "09876543213"}
+        )
+
+    def test_exiting_post(self):
+        response = self.client.post(
+            self.url,
+            self.already_exists_data,
+            format='json'
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            json.loads(response.content),
+            {"detail": "User already exists"}
         )
