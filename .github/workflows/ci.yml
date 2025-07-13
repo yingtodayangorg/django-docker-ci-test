@@ -6,7 +6,8 @@ on:
   pull_request:
     branches: [main]
 jobs:
-  build:
+  test:
+    name: Build, Test & Code Snalysis
     runs-on: ubuntu-latest
     env:
         DEBUG: 0
@@ -42,7 +43,7 @@ jobs:
           python manage.py test
 
   docker:
-    needs: build-and-test
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
