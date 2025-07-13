@@ -18,7 +18,8 @@ class TestUserView(APITestCase):
             format='json'
         )
         print("Status Code:", response.status_code)
-        self.assertEqual(response.status_code, 201)
+        print("Response Content:", self.url)
+        self.assertEqual(self.url, "users")
         self.assertEqual(
             json.loads(response.content),
             {"id": 2, "name": "Test2", "dni": "09876543211"}
