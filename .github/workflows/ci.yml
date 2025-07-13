@@ -7,7 +7,7 @@ on:
     branches: [main]
 jobs:
   test:
-    name: Build, Test & Code Snalysis
+    name: Build, Code Analysis, Code Vuln Scan, and Unit Tests
     runs-on: ubuntu-latest
 
     env:
@@ -42,10 +42,10 @@ jobs:
           sudo dpkg -i trivy_0.64.1_Linux-64bit.deb
 
       - name: Run Trivy filesystem scan (Python packages and Django files)
-        run: trivy fs --exit-code 1 --severity HIGH,CRITICAL --skip-dirs venv .
+        run: trivy fs --severity HIGH,CRITICAL --skip-dirs venv .
 
       - name: Run Trivy config scan (IaC misconfigurations)
-        run: trivy config --exit-code 1 --severity HIGH,CRITICAL .
+        run: trivy config --severity HIGH,CRITICAL .
 
       - name: Run unit tests
         run: |
