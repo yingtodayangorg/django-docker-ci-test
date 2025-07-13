@@ -33,7 +33,7 @@ CSRF_COOKIE_SECURE = True
 X_FRAME_OPTIONS = 'DENY'
 SECURE_SSL_REDIRECT = True if DEBUG is False else False
 # Uncomment and set your domain for production
-# CSRF_TRUSTED_ORIGINS = ['https://yourdomain.com']  
+# CSRF_TRUSTED_ORIGINS = ['https://yourdomain.com']
 
 # Application definition
 
