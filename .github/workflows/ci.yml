@@ -35,6 +35,18 @@ jobs:
         run: |
           flake8 .
 
+      - name: Install Trivy
+        run: |
+          sudo apt-get install -y wget
+          wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.64.1_Linux-64bit.deb
+          sudo dpkg -i trivy_0.64.1_Linux-64bit.deb
+
+      - name: Run Trivy filesystem scan (Python packages and Django files)
+        run: trivy fs --exit-code 1 --severity HIGH,CRITICAL --skip-dirs venv .
+
+      - name: Run Trivy config scan (IaC misconfigurations)
+        run: trivy config --exit-code 1 --severity HIGH,CRITICAL .
+
       - name: Run unit tests
         run: |
           coverage run manage.py test
@@ -64,7 +76,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/django-app:latest
 
-  security-scan:
+  docker-image-security-scan:
     needs: docker
     runs-on: ubuntu-latest
     if: always()
@@ -75,12 +87,6 @@ jobs:
           sudo apt-get install -y wget
           wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.64.1_Linux-64bit.deb
           sudo dpkg -i trivy_0.64.1_Linux-64bit.deb
-
-      - name: Run Trivy filesystem scan (Python packages and Django files)
-        run: trivy fs --exit-code 1 --severity HIGH,CRITICAL --skip-dirs venv .
-
-      - name: Run Trivy config scan (IaC misconfigurations)
-        run: trivy config --exit-code 1 --severity HIGH,CRITICAL .
 
       - name: Scan Docker image for vulnerabilities
         run: trivy image ${{ secrets.DOCKER_USERNAME }}/django-app:latest
