@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: django
+  template:
+    metadata:
+      labels:
+        app: django
+    spec:
+      volumes:
+        - name: static-files
+          emptyDir: {}
+        - name: nginx-config
+          configMap:
+            name: nginx-config
+      initContainers:
+        - name: collectstatic
+          image: yingtodayang/django-app:latest
+          command: ["sh", "-c", "python manage.py migrate & python manage.py collectstatic --noinput"]
+          envFrom:
+            - secretRef:
+                name: django-secret
+            - configMapRef:
+                name: django-config
+          volumeMounts:
+            - name: static-files
+              mountPath: /app/static
+      containers:
+        - name: django-web
+          image: yingtodayang/django-app:latest
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: django-config
+            - secretRef:
+                name: django-secret
+          volumeMounts:
+            - name: static-files
+              mountPath: /app/static
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 8081
+          volumeMounts:
+            - name: static-files
+              mountPath: /app/static
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d
