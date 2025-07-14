@@ -23,7 +23,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Security settings
-SECURE_SSL_REDIRECT = os.getenv("ALLOWED_HOSTS", False)
+SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", "False").lower() == "true"
 # Uncomment and set your domain for production
 # CSRF_TRUSTED_ORIGINS = ['https://yourdomain.com']
 
