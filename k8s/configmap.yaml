@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: django-config
 data:
-  DJANGO_SETTINGS_MODULE: demo.settings
-  DEBUG: "0"
+  DEBUG: "1"
   DATABASE_NAME: "db.sqlite3"
   ALLOWED_HOSTS: "*"
+  SECURE_SSL_REDIRECT: "False"
