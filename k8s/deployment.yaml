@@ -47,8 +47,16 @@ spec:
             httpGet:
               path: /health
               port: 8000
+              scheme: HTTP 
             initialDelaySeconds: 5
             periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 20
 
         - name: nginx
           image: nginx:alpine
