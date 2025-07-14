@@ -4,25 +4,14 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PATH="/home/demouser/.local/bin:$PATH"
 
-ARG DJANGO_SECRET_KEY
-ENV DJANGO_SECRET_KEY=$DJANGO_SECRET_KEY
-
 RUN adduser --disabled-password --no-create-home demouser
 
 WORKDIR /app
 
 COPY . .
-COPY .env /app/.env
-
 
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
-
-ENV DJANGO_SETTINGS_MODULE=demo.settings
-
-# collectstatic necesita variables, así que cargamos manualmente
-RUN export $(cat .env | xargs) && \
-    python manage.py collectstatic --noinput
 
 COPY . .
 

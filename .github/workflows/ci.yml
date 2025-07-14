@@ -31,6 +31,10 @@ jobs:
           pip install -r requirements.txt
           pip install coverage flake8
 
+      - name: Run collectstatic
+        run: |
+          python manage.py collectstatic --noinput
+
       - name: Run static code analysis
         run: |
           flake8 .
