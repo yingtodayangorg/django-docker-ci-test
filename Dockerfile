@@ -2,6 +2,7 @@ FROM python:3.11.3
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV PATH="/home/demouser/.local/bin:$PATH"
 
 RUN addgroup --system demogroup && adduser --system --ingroup demogroup demouser
 
