@@ -1,139 +1,88 @@
-# Demo Devops Python
+# Despliegue de Aplicación Django en Kubernetes con GitHub Actions
 
-This is a simple application to be used in the technical test of DevOps.
+Este proyecto demuestra cómo contenerizar, analizar, probar y desplegar una aplicación Django utilizando GitHub Actions y Kubernetes (usando Docker Desktop o Minikube como entorno local).
 
-## Getting Started
+---
 
-### Prerequisites
+## 📁 Estructura del Proyecto
 
-- Python 3.11.3
+```
+.
+├── Dockerfile
+├── docker-compose.yml
+├── k8s/
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   ├── ingress.yaml
+│   ├── configmap.yaml
+│   ├── secret.yaml
+│   └── volume.yaml
+├── .github/workflows/
+│   └── ci-cd.yml
+├── manage.py
+└── demo/
+    └── ...
+```
 
-### Installation
+---
 
-Clone this repo.
+## ⚙️ Flujo del Pipeline (CI/CD)
+
+El pipeline de GitHub Actions realiza las siguientes etapas:
+
+1. **Checkout** del código
+2. **Instalación de dependencias** (Python y herramientas de análisis)
+3. **Análisis estático** (flake8)
+4. **Escaneo de vulnerabilidades** con Trivy
+5. **Ejecución de pruebas unitarias**
+6. **Build y push del contenedor Docker a DockerHub**
+7. **Escaneo de vulnerabilidades de imagen docker**
+8. **Despliegue en Kubernetes**
+
+---
+
+## 📸 Diagrama del pipeline
+
+![Pipeline](A_comprehensive_documentation_document_for_a_Djang.png)
+
+---
+
+## 🚀 Despliegue en Kubernetes
+
+Se utiliza Ingress para enrutar el tráfico HTTP hacia el servicio de Django dentro del clúster.
+
+- Acceso local a través de: `http://django-app.local` o `https://django-app.local`
+- Puerto expuesto: `8080` en el host, redirigiendo al `8081` interno de Nginx para servir contenido estático, redirigido al `8000` interno de Gunicorn
+
+**Componentes creados en Kubernetes:**
+- `Deployment`: 2 réplicas de la app Django
+- `Service`: ClusterIP con puerto 8080
+- `Ingress`: Con host `django-app.local`
+- `ConfigMap`: Variables como `DEBUG=0`, `SECURE_SSL_REDIRECT=False`
+- `ConfigMapNginx`: Configuraciones internas de Nginx como reverse proxy
+- `Secrets`: Variables sensibles como `DJANGO_SECRET_KEY`
+
+---
+
+## 🔐 Certificados SSL (opcional)
+
+Se puede agregar Let’s Encrypt + cert-manager para generación automática de certificados TLS para entornos públicos.
 
 ```bash
-git clone https://bitbucket.org/devsu/demo-devops-python.git
+kubectl create secret tls django-tls-secret --cert=./certs/cert.crt --key=./certs/cert.key
 ```
+Los certificados se generaron con makecert para un ambiente local en el directorio `certs` con dominio `django-app.local`
+---
 
-Install dependencies.
+## 🧪 Probar el servicio
 
-```bash
-pip install -r requirements.txt
-```
+- Verificar que `django-app.local` resuelva en `/etc/hosts` o `C:\Windows\System32\drivers\etc\hosts`
+- Ejecuta: `kubectl port-forward svc/django-service 8080:8080`
+- Accede a: [http://localhost:8080](http://localhost:8080)
 
-Migrate database
+---
 
-```bash
-py manage.py makemigrations
-py manage.py migrate
-```
+## 📝 Notas
 
-### Database
-
-The database is generated as a file in the main path when the project is first run, and its name is `db.sqlite3`.
-
-Consider giving access permissions to the file for proper functioning.
-
-## Usage
-
-To run tests you can use this command.
-
-```bash
-py manage.py test
-```
-
-To run locally the project you can use this command.
-
-```bash
-py manage.py runserver
-```
-
-Open http://localhost:8000/api/ with your browser to see the result.
-
-### Features
-
-These services can perform,
-
-#### Create User
-
-To create a user, the endpoint **/api/users/** must be consumed with the following parameters:
-
-```bash
-  Method: POST
-```
-
-```json
-{
-    "dni": "dni",
-    "name": "name"
-}
-```
-
-If the response is successful, the service will return an HTTP Status 200 and a message with the following structure:
-
-```json
-{
-    "id": 1,
-    "dni": "dni",
-    "name": "name"
-}
-```
-
-If the response is unsuccessful, we will receive status 400 and the following message:
-
-```json
-{
-    "detail": "error"
-}
-```
-
-#### Get Users
-
-To get all users, the endpoint **/api/users** must be consumed with the following parameters:
-
-```bash
-  Method: GET
-```
-
-If the response is successful, the service will return an HTTP Status 200 and a message with the following structure:
-
-```json
-[
-    {
-        "id": 1,
-        "dni": "dni",
-        "name": "name"
-    }
-]
-```
-
-#### Get User
-
-To get an user, the endpoint **/api/users/<id>** must be consumed with the following parameters:
-
-```bash
-  Method: GET
-```
-
-If the response is successful, the service will return an HTTP Status 200 and a message with the following structure:
-
-```json
-{
-    "id": 1,
-    "dni": "dni",
-    "name": "name"
-}
-```
-
-If the user id does not exist, we will receive status 404 and the following message:
-
-```json
-{
-    "detail": "Not found."
-}
-```
-
-## License
-
-Copyright © 2023 Devsu. All rights reserved.
+- El flag `SECURE_SSL_REDIRECT` debe estar desactivado si usas HTTP
+- Se ejecuta `collectstatic` durante el build ya que se usa NGINX para servir archivos estáticos
