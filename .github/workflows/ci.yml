@@ -104,8 +104,9 @@ jobs:
 
       - name: Scan Docker image for vulnerabilities
         run: trivy image ${{ secrets.DOCKER_USERNAME }}/django-app:latest
-  deploy:
-    needs: docker
+
+  deploy_kubernetes:
+    needs: docker-image-security-scan
     runs-on: ubuntu-latest
     environment: production
 
