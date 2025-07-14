@@ -41,12 +41,6 @@ El pipeline de GitHub Actions realiza las siguientes etapas:
 
 ---
 
-## 📸 Diagrama del pipeline
-
-![Pipeline](A_comprehensive_documentation_document_for_a_Djang.png)
-
----
-
 ## 🚀 Despliegue en Kubernetes
 
 Se utiliza Ingress para enrutar el tráfico HTTP hacia el servicio de Django dentro del clúster.
