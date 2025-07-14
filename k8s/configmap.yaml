@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: django-config
+data:
+  DJANGO_SETTINGS_MODULE: demo.settings
+  DEBUG: "1"
+  DJANGO_SECRET_KEY: "bq!t%6edg&=4=npn47h%_ea4eoo@@#x(@ki#%&-qu9ps%vdv!x"
+  DATABASE_NAME: "db.sqlite3"
+  ALLOWED_HOSTS: "*"
