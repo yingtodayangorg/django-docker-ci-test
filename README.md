@@ -81,3 +81,4 @@ Los certificados se generaron con makecert para un ambiente local en el director
 - El flag `SECURE_SSL_REDIRECT` debe estar desactivado si usas HTTP
 - Se ejecuta `collectstatic` durante el build ya que se usa NGINX para servir archivos estáticos
 - El despliegue en AKS con Terraform requiere variables de una suscripcion de Azure
+- El deploy en Kubernetes local requiere de exponer el Kube API con ngrok y configurar en el archivo kubeconfig
