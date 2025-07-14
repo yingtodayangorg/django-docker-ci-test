@@ -104,3 +104,33 @@ jobs:
 
       - name: Scan Docker image for vulnerabilities
         run: trivy image ${{ secrets.DOCKER_USERNAME }}/django-app:latest
+  deploy:
+    needs: docker
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Kubeconfig
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Set up KUBECONFIG
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+          kubectl apply -f k8s/ingress.yaml
+          kubectl apply -f k8s/configmap.yaml
+          kubectl apply -f k8s/configMapNginx.yaml
+          kubectl apply -f k8s/secret.yaml
+          kubectl apply -f k8s/hpa.yaml
+          kubectl rollout restart deployment django-app
