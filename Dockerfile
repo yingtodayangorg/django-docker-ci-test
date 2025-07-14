@@ -4,25 +4,32 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PATH="/home/demouser/.local/bin:$PATH"
 
-RUN addgroup --system demogroup && adduser --system --ingroup demogroup demouser
+ARG DJANGO_SECRET_KEY
+ENV DJANGO_SECRET_KEY=$DJANGO_SECRET_KEY
+
+RUN adduser --disabled-password --no-create-home demouser
 
 WORKDIR /app
-RUN mkdir -p /app && chown -R demouser:demogroup /app
+
+COPY . .
+COPY .env /app/.env
 
 
-
-COPY --chown=demouser:demogroup requirements.txt .
+COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-COPY --chown=demouser:demogroup . .
+ENV DJANGO_SETTINGS_MODULE=demo.settings
 
+# collectstatic necesita variables, así que cargamos manualmente
+RUN export $(cat .env | xargs) && \
+    python manage.py collectstatic --noinput
+
+COPY . .
+
+USER demouser
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl --fail http://localhost:8000/health/ || exit 1
 
 EXPOSE 8000
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-USER demouser
-ENTRYPOINT ["/entrypoint.sh"]
+CMD ["gunicorn", "demo.wsgi:application", "--bind", "0.0.0.0:8000"]
